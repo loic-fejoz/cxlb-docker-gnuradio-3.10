@@ -1,10 +1,9 @@
-FROM debian:bullseye
+FROM debian:bookworm
+
+LABEL org.opencontainers.image.source=https://github.com/CorteXlab/cxlb-docker-gnuradio-3.10
+LABEL org.opencontainers.image.description="Image intended to run GNU Radio 3.10 in CorteXlab"
 
 ENV APT="apt-get -y"
-
-# pinning
-RUN echo "deb http://ftp.debian.org/debian/ bookworm main non-free contrib" >> /etc/apt/sources.list
-RUN echo "Package: *\nPin: release a=bullseye\nPin-Priority: 700\n\nPackage: *\nPin: release a=stable\nPin-Priority: 700\n\nPackage: *\nPin: release a=bookworm\nPin-Priority: -1\n\nPackage: *\nPin: release a=testing\nPin-Priority: -1" > /etc/apt/preferences.d/pinning
 
 RUN ${APT} update && ${APT} dist-upgrade
 
@@ -29,6 +28,11 @@ RUN touch /root/.Xauthority
 # cxlb-build-toolchain.git
 RUN ${APT} install git
 RUN git clone https://github.com/CorteXlab/cxlb-build-toolchain.git cxlb-build-toolchain.git
+
+# Bypass issues with PEP668 (externally managed)
+RUN mkdir -p /root/.config/pip && touch /root/.config/pip/pip.conf
+RUN echo "\n[global]" >> /root/.config/pip/pip.conf
+RUN echo "break-system-packages = true" >> /root/.config/pip/pip.conf
 
 # build toolchain (separate build steps to benefit from docker cache in case of build issues on a specific module)
 ENV BUILD="cxlb-build-toolchain.git/cxlb-build-toolchain -y /usr/bin/python3 -as"
