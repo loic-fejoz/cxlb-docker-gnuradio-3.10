@@ -77,16 +77,18 @@ jobs:
           docker run --rm test-image:latest /bin/bash -lc "gnuradio-config-info --version"
 
           echo "=== Testing UHD version ==="
-          docker run --rm test-image:latest /bin/bash -lc "uhd_find_devices --version"
+          docker run --rm test-image:latest /bin/bash -lc "uhd_config_info --version"
 
           echo "=== Testing Volk version ==="
           docker run --rm test-image:latest /bin/bash -lc "volk-config-info --version"
 
           echo "=== Testing Python imports and NumPy compatibility ==="
           docker run --rm test-image:latest /bin/bash -lc "python3 -c '
-          import gnuradio, uhd, bokehgui, numpy as np
-          print(\"GNU Radio version:\", gnuradio.__version__)
+          from gnuradio import gr
+          import uhd, bokehgui, numpy as np
+          print(\"GNU Radio version:\", gr.version())
           print(\"UHD version:\", uhd.__version__)
+          print(\"BokehGUI module:\", bokehgui.__file__)
           print(\"NumPy version:\", np.__version__)
           assert int(np.__version__.split(\".\")[0]) < 2, \"NumPy version must be < 2\"
           '"
