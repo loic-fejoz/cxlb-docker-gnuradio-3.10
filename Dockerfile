@@ -26,7 +26,7 @@ RUN echo "AddressFamily inet" >> /etc/ssh/sshd_config
 RUN touch /root/.Xauthority
 
 # cxlb-build-toolchain.git
-RUN ${APT} install git
+RUN ${APT} install git python3 python3-pip
 RUN git clone https://github.com/CorteXlab/cxlb-build-toolchain.git cxlb-build-toolchain.git
 
 # Bypass issues with PEP668 (externally managed)
@@ -37,16 +37,19 @@ RUN echo "break-system-packages = true" >> /root/.config/pip/pip.conf
 # build toolchain (separate build steps to benefit from docker cache in case of build issues on a specific module)
 ENV BUILD="cxlb-build-toolchain.git/cxlb-build-toolchain -y /usr/bin/python3 -as"
 ENV PARMS="cxlb_toolchain_build /cortexlab/toolchains/current"
-RUN ${APT} install udev
+RUN ${APT} install udev libprotobuf-dev protobuf-compiler libgrpc++-dev protobuf-compiler-grpc
 RUN ${BUILD} uhd=master ${PARMS}
 RUN ${BUILD} uhd-firmware ${PARMS}
 RUN ${BUILD} volk=main ${PARMS}
-RUN ${APT} install python3-pygccxml/bookworm
+RUN ${APT} install python3-pygccxml
 RUN ${BUILD} gnuradio=maint-3.10 ${PARMS}
-RUN ${APT} -t bookworm install nodejs
+RUN ${APT} install nodejs
 RUN ${BUILD} gr-bokehgui=master ${PARMS}
 RUN ${BUILD} gr-iqbal=master ${PARMS}
 # RUN ${BUILD} fft-web ${PARMS}
+
+# GNU Radio 3.10 is built against NumPy 1.x ABI; bokeh pulled NumPy 2.x, downgrade back to NumPy 1.x
+RUN pip install "numpy<2"
 
 # activate toolchain configuration
 RUN /cortexlab/toolchains/current/bin/cxlb-toolchain-system-conf
