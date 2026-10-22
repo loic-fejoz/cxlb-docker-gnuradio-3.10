@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.grc.old
+
+# Local test flowgraphs and scripts
+kiss_gfsk*
+test_kiss_gfsk_udp.py

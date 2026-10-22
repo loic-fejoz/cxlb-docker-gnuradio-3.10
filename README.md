@@ -1,10 +1,18 @@
 cxlb-docker-gnuradio-3.10
 =========================
 
-Docker image with a GNURadio-3.10 toolchain
+Docker image with a GNURadio-3.10 toolchain for CorteXlab.
 
 quick howto
 -----------
+
+### Using the prebuilt image from GitHub Container Registry (recommended)
+
+- pull and start the container:
+
+    docker run -dti --net=host ghcr.io/cortexlab/cxlb-docker-gnuradio-3.10:latest
+
+### Building locally
 
 - build the docker image:
 
@@ -14,6 +22,9 @@ quick howto
 
     docker run -dti --net=host cxlb-gnuradio-3.10
 
-- then connect to this container with ssh:
+### Connecting
+
+- connect to this container with ssh:
 
     ssh -Xp 2222 root@localhost
+
